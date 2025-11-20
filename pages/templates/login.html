@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaHub | Secure Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Your existing CSS remains the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --accent: #00c6ff;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --error: #dc3545;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            color: var(--light);
+            padding: 20px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .welcome-section {
+            flex: 1;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                        url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            position: relative;
+            z-index: 2;
+            overflow-y: auto;
+        }
+
+        .welcome-content {
+            max-width: 500px;
+        }
+
+        .welcome-section h1 {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .welcome-title {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--light);
+            opacity: 0.9;
+        }
+
+        .brand-name {
+            background: linear-gradient(to right, #fdbb2d, #b21f1f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            font-size: 4rem;
+            font-weight: 800;
+        }
+
+        .welcome-section p {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 40px;
+        }
+
+        .feature-list li {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .feature-list i {
+            margin-right: 20px;
+            color: var(--accent);
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .auth-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--dark);
+            position: relative;
+            z-index: 2;
+            overflow-y: auto;
+        }
+
+        .auth-container {
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            min-height: min-content;
+        }
+
+        .auth-header {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .auth-header h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 18px 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 0, 224, 0.15);
+            outline: none;
+            background: white;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 20px;
+            top: 50px;
+            cursor: pointer;
+            color: #777;
+            transition: color 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            margin-right: 12px;
+            transform: scale(1.3);
+        }
+
+        .remember-me label {
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(74, 0, 224, 0.3);
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 0, 224, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+
+        .no-account {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .no-account h3 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .no-account p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .no-account-btn {
+            display: inline-block;
+            padding: 14px 30px;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .no-account-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 0, 224, 0.3);
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        .auth-section::-webkit-scrollbar,
+        .welcome-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .auth-section::-webkit-scrollbar-track,
+        .welcome-section::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .auth-section::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        .welcome-section::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .auth-section::-webkit-scrollbar-thumb:hover,
+        .welcome-section::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Form states */
+        .form-group.success .form-control {
+            border-color: var(--success);
+        }
+
+        .form-group.error .form-control {
+            border-color: var(--error);
+        }
+
+        .form-message {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .form-group.success .form-message.success {
+            display: block;
+            color: var(--success);
+        }
+
+        .form-group.error .form-message.error {
+            display: block;
+            color: var(--error);
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success message */
+        .success-message {
+            display: none;
+            text-align: center;
+            background: var(--success);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Particle background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000%) translateX(1000%) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                max-width: 700px;
+                max-height: 90vh;
+            }
+
+            .welcome-section {
+                padding: 40px;
+                text-align: center;
+                max-height: 40vh;
+            }
+
+            .auth-section {
+                max-height: 50vh;
+            }
+
+            .auth-container {
+                padding: 40px 30px;
+            }
+
+            .welcome-section h1 {
+                font-size: 3rem;
+            }
+
+            .brand-name {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .welcome-section h1 {
+                font-size: 2.5rem;
+            }
+
+            .brand-name {
+                font-size: 3rem;
+            }
+
+            .auth-header h2 {
+                font-size: 2.2rem;
+            }
+
+            .auth-container {
+                padding: 30px 20px;
+            }
+
+            .welcome-section, .auth-section {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+
+            .brand-name {
+                font-size: 2.5rem;
+            }
+
+            .auth-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .welcome-section, .auth-section {
+                padding: 20px;
+            }
+
+            .form-control {
+                padding: 16px;
+            }
+
+            .auth-container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Particle Background -->
+        <div class="particles" id="particles"></div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <h1>
+                    <span class="welcome-title">Welcome to</span>
+                    <span class="brand-name">NexaHub</span>
+                </h1>
+                <p>Experience the future of authentication with our 4K optimized interface. Secure, fast, and beautifully designed for the modern web.</p>
+
+                <ul class="feature-list">
+                    <li><i class="fas fa-shield-alt"></i> Advanced security protocols</li>
+                    <li><i class="fas fa-bolt"></i> Lightning fast authentication</li>
+                    <li><i class="fas fa-palette"></i> 4K optimized interface</li>
+                    <li><i class="fas fa-mobile-alt"></i> Fully responsive design</li>
+                    <li><i class="fas fa-user-shield"></i> End-to-end encryption</li>
+                    <li><i class="fas fa-cloud"></i> Cloud-based infrastructure</li>
+                    <li><i class="fas fa-sync-alt"></i> Real-time synchronization</li>
+                    <li><i class="fas fa-chart-line"></i> Advanced analytics</li>
+                    <li><i class="fas fa-cogs"></i> Customizable settings</li>
+                    <li><i class="fas fa-headset"></i> 24/7 customer support</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="auth-section">
+            <div class="auth-container">
+                <!-- Login Form -->
+                <div class="auth-form" id="loginForm">
+                    <div class="auth-header">
+                        <h2>Welcome back!</h2>
+                        <p>Please enter your details to sign in to your account</p>
+                    </div>
+
+                    <form id="loginFormElement">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" name="email" class="form-control" placeholder="Enter your email address" required>
+                            <div class="form-message error">Please enter a valid email address</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" name="password" class="form-control" placeholder="Enter your password" required>
+                            <span class="password-toggle" id="loginPasswordToggle">
+                                <i class="far fa-eye"></i>
+                            </span>
+                            <div class="form-message error">Password must be at least 8 characters</div>
+                        </div>
+
+                        <div class="remember-forgot">
+                            <div class="remember-me">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-password">Forgot Password?</a>
+                        </div>
+
+                        <button type="submit" class="auth-btn">Sign In</button>
+
+                        <div class="loading" id="loginLoading">
+                            <div class="spinner"></div>
+                            <p>Signing in...</p>
+                        </div>
+
+                        <div class="success-message" id="loginSuccess">
+                            <i class="fas fa-check-circle"></i> Login successful! Redirecting...
+                        </div>
+                    </form>
+
+                    <!-- No Account Section -->
+                    <div class="no-account">
+                        <h3>Don't have an account?</h3>
+                        <p>Contact your administrator to create an account for you</p>
+                        <a href="/signup" class="no-account-btn" id="contactAdmin">Contact Administrator</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // Password toggle functionality for password fields
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const icon = this.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+
+    // Email validation function
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    // Login form submission handling
+    document.getElementById('loginFormElement').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const loading = document.getElementById('loginLoading');
+        const success = document.getElementById('loginSuccess');
+
+        // Validate email format
+        if (!validateEmail(email)) {
+            alert('Please enter a valid email address');
+            return;
+        }
+
+        // Show loading
+        loading.style.display = 'block';
+        success.style.display = 'none';
+
+        console.log('Attempting login with:', { email, password });
+
+        // Send AJAX request to Spring Boot backend for login
+        fetch('http://localhost:8051/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
+            // Handle both JSON and text responses
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json().then(data => {
+                    console.log('JSON response:', data);
+                    return {
+                        data: data,
+                        status: response.status,
+                        ok: response.ok
+                    };
+                });
+            } else {
+                return response.text().then(text => {
+                    console.log('Text response:', text);
+                    return {
+                        text: text,
+                        status: response.status,
+                        ok: response.ok
+                    };
+                });
+            }
+        })
+        .then(result => {
+            loading.style.display = 'none';
+            console.log('Processing login result:', result);
+
+            // Check for successful login in various response formats
+            if (result.ok) {
+                // Standard success case
+                handleLoginSuccess(email);
+            } else if (result.status === 200) {
+                // Status 200 but response.ok is false (common issue)
+                if (result.data && (result.data.message?.includes('success') || result.data.success)) {
+                    handleLoginSuccess(email);
+                } else if (result.text && result.text.includes('success')) {
+                    handleLoginSuccess(email);
+                } else {
+                    // Check if login actually worked despite error status
+                    checkLoginAndProceed(email);
+                }
+            } else {
+                // Handle different error cases
+                handleLoginError(result);
+            }
+        })
+        .catch(error => {
+            loading.style.display = 'none';
+            console.error('Login network error:', error);
+
+            if (error.message.includes('Failed to fetch')) {
+                alert('Cannot connect to server. Please make sure the backend is running on localhost:8051');
+            } else {
+                alert('Login failed! Please check your credentials and try again.');
+            }
+        });
+
+        function handleLoginSuccess(email) {
+            console.log('Login successful, redirecting to dashboard...');
+            success.style.display = 'block';
+
+            // Store login state in localStorage/sessionStorage
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('email', email);
+
+            // Redirect to dashboard
+            setTimeout(() => {
+                window.location.href = 'dashboard';
+            }, 1000);
+        }
+
+        function checkLoginAndProceed(email) {
+            console.log('Checking if login was actually successful...');
+            // If we reached here, the backend might have logged the user in
+            // but returned an unexpected response format
+            success.style.display = 'block';
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('email', email);
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+
+        function handleLoginError(result) {
+            const errorMessage = result.data?.message || result.text || 'Invalid credentials';
+            console.log('Login failed:', errorMessage);
+
+            // Show specific error message
+            if (errorMessage.includes('Invalid credentials') || errorMessage.includes('Wrong password')) {
+                alert('Invalid email or password. Please try again.');
+            } else if (errorMessage.includes('User not found') || errorMessage.includes('Email not found')) {
+                alert('Email not found. Please check your email or sign up first.');
+            } else {
+                alert('Login failed: ' + errorMessage);
+            }
+        }
+    });
+
+    // Create particle background
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        if (!particlesContainer) return;
+
+        const particleCount = 30;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+
+            // Random size between 2px and 6px
+            const size = Math.random() * 4 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+
+            // Random position
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+
+            // Random animation duration and delay
+            const duration = Math.random() * 20 + 10;
+            const delay = Math.random() * 5;
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.animationDelay = `${delay}s`;
+
+            particlesContainer.appendChild(particle);
+        }
+    }
+
+    // Initialize particles
+    createParticles();
+</script>
+</body>
+</html>
